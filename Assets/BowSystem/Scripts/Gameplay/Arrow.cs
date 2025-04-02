@@ -33,7 +33,7 @@ namespace BowSystem.Scripts.Gameplay
                 if (hit.rigidbody != null)
                 {
                     var difference = (Vector2)transform.position - hit.point;
-                    var velocity = difference.normalized * Mathf.Max(0, Radius - difference.magnitude) * difference.normalized;
+                    var velocity = -difference.normalized * Mathf.Max(0, Radius - difference.magnitude) * Power;
                     
                     hit.rigidbody.AddForceAtPosition(velocity, transform.position, ForceMode2D.Impulse);
                 }
