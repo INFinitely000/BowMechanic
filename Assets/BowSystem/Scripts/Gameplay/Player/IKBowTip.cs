@@ -1,9 +1,8 @@
-using System;
 using Spine;
 using Spine.Unity;
 using UnityEngine;
 
-namespace BowSystem.Scripts.Service
+namespace BowSystem.Scripts.Gameplay.Player
 {
     public class IKBowTip : MonoBehaviour
     {

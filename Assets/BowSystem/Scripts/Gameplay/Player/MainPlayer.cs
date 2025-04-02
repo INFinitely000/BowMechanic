@@ -1,11 +1,12 @@
-using System;
+using BowSystem.Scripts.Service;
 using UnityEngine;
 
-namespace BowSystem.Scripts.Service
+namespace BowSystem.Scripts.Gameplay.Player
 {
     public class MainPlayer : MonoBehaviour
     {
         [field: SerializeField] public PlayerBow Bow { get; private set; }
+        [field: SerializeField] public MouseTargetable Targetable { get; private set; }
 
         public IInput Input { get; private set; }
         
@@ -18,14 +19,20 @@ namespace BowSystem.Scripts.Service
         
         private void Update()
         {
-            Bow.isAim = Input.IsAim;
-
-            if (Input.IsShoot) Bow.TryShoot();
+            if (Time.time < 0.5f) return;
+            
+            switch (Input.IsShoot)
+            {
+                case InputType.Down: Bow.StartAiming(); 
+                    break;
+                
+                case InputType.Up: Bow.TryShoot(); Bow.EndAiming();
+                    break;
+            }
 
             var targetPosition = Camera.main.ScreenToWorldPoint(Input.AimPosition);
             
-            transform.rotation =
-                Quaternion.Euler(Vector3.forward * -Vector2.SignedAngle(targetPosition - transform.position, Vector2.right));
+            Targetable.TargetTo( Camera.main.ScreenToWorldPoint(Input.AimPosition) );
         }
     }
 }

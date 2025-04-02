@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
-using Spine;
+using BowSystem.Scripts.Service;
 using Spine.Unity;
 using UnityEngine;
-using UnityEngine.Events;
-using Event = Spine.Event;
 
-namespace BowSystem.Scripts.Service
+namespace BowSystem.Scripts.Gameplay.Player
 {
     public class PlayerBow : MonoBehaviour
     {
@@ -17,29 +14,33 @@ namespace BowSystem.Scripts.Service
         
         public IFactory Factory { get; private set; }
         public IInput Input { get; private set; }
+
+        public Vector2 Velocity => (Camera.main.ScreenToWorldPoint(Input.AimPosition) - transform.position) * Power;
         
         public event Action TryingToShoot;
-        public bool isAim;
+        public event Action StartedAiming;
+        public event Action EndedAiming;
 
+        
         public void Construct(IFactory factory, IInput input)
         {
             Factory = factory;
             Input = input;
         }
         
-        public bool TryShoot()
+        public void TryShoot()
         {
             TryingToShoot?.Invoke();
-            
-            return true;
         }
 
         public void Shoot()
         {
             var position = Tip.position;
-            var velocity = (Camera.main.ScreenToWorldPoint(Input.AimPosition) - transform.position) * Power;
 
-            var arrow = Factory.CreateArrow(position, velocity);
+            var arrow = Factory.CreateArrow(position, Velocity);
         }
+
+        public void StartAiming() => StartedAiming?.Invoke();
+        public void EndAiming() => EndedAiming?.Invoke();
     }
 }

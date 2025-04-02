@@ -1,4 +1,5 @@
 using BowSystem.Scripts.Gameplay;
+using BowSystem.Scripts.Gameplay.Player;
 using UnityEngine;
 
 namespace BowSystem.Scripts.Service

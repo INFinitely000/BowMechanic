@@ -1,4 +1,5 @@
 using BowSystem.Scripts.Gameplay;
+using BowSystem.Scripts.Gameplay.Player;
 using UnityEngine;
 
 namespace BowSystem.Scripts.Service
@@ -10,12 +11,14 @@ namespace BowSystem.Scripts.Service
         
         public readonly IAssets Assets;
         public readonly IInput Input;
+        public readonly GameData Data;
 
 
-        public Factory(IAssets assets, IInput input)
+        public Factory(IAssets assets, IInput input, GameData data)
         {
             Assets = assets;
             Input = input;
+            Data = data;
         }
 
         public GameObject Create(string objectName)
@@ -42,6 +45,7 @@ namespace BowSystem.Scripts.Service
                 arrow.transform.position = position;
                 arrow.Rigidbody.velocity = velocity;
                 arrow.transform.rotation = Quaternion.Euler(Vector3.forward * -Vector2.SignedAngle(velocity, Vector2.right));
+                arrow.Construct(radius: Data.ExplosionRadius, power: Data.ExplosionPower);
 
             return arrow;
         }

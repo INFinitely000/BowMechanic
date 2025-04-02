@@ -4,7 +4,7 @@ using Spine.Unity;
 using UnityEngine;
 using Event = Spine.Event;
 
-namespace BowSystem.Scripts.Service
+namespace BowSystem.Scripts.Gameplay.Player
 {
     public class PlayerBowPresenter : MonoBehaviour
     {
@@ -17,41 +17,66 @@ namespace BowSystem.Scripts.Service
         [field: SerializeField] public PlayerBow Bow { get; private set; }
         [field: SerializeField] public SkeletonAnimation Animation { get; private set; }
 
-        private bool isAim;
-
-
-        private void Update()
+        public PlayerBowPresenterState State
         {
-            if (isAim && Bow.isAim == false && Animation.AnimationName != AttackAnimationName) Animation.AnimationState.SetAnimation(0, IdleAnimationName, true);
-            if (isAim == false && Bow.isAim)
+            get
             {
-                Animation.AnimationState.ClearTrack(0);
-                Animation.AnimationState.SetAnimation(0, AimAnimationName, false);
-                Animation.AnimationState.AddAnimation(0, TargetAnimationName, true, 0f);
+                switch(Animation.AnimationName)
+                {
+                    case AimAnimationName: return PlayerBowPresenterState.Aiming;  
+                    case TargetAnimationName: return PlayerBowPresenterState.Targeting; 
+                    case AttackAnimationName: return PlayerBowPresenterState.Shoot; 
+                    
+                    default: return PlayerBowPresenterState.Idle;
+                }
             }
-
-            isAim = Bow.isAim;
         }
 
+
+        
+        public void StartAiming()
+        {
+            Animation.AnimationState.ClearTrack(0);
+            Animation.AnimationState.SetAnimation(0, AimAnimationName, false);
+            Animation.AnimationState.AddAnimation(0, TargetAnimationName, true, 0f);
+        }
+
+        public void EndAiming()
+        {
+            if (State != PlayerBowPresenterState.Shoot) 
+                Idle();
+        }
+        
+        private void Idle()
+        {
+            Animation.AnimationState.SetAnimation(0, IdleAnimationName, true);
+        }
+        
+
+        private void OnBowTryingToShoot()
+        {
+            if (State == PlayerBowPresenterState.Targeting)
+                Animation.AnimationState.SetAnimation(0, AttackAnimationName, false);
+        }
+        
+        private void Start() => Idle();
+        
         private void OnEnable()
         {
             Animation.AnimationState.Event += OnAnimationEvent;
+            
             Bow.TryingToShoot += OnBowTryingToShoot;
+            Bow.StartedAiming += StartAiming;
+            Bow.EndedAiming += EndAiming;
         }
 
         private void OnDisable()
         {
             Animation.AnimationState.Event -= OnAnimationEvent;
+            
             Bow.TryingToShoot -= OnBowTryingToShoot;
-        }
-
-        private void OnBowTryingToShoot()
-        {
-            if (Animation.AnimationName == TargetAnimationName || Animation.AnimationName == AimAnimationName)
-            {
-                Animation.AnimationState.AddAnimation(0, AttackAnimationName, false, 0f);
-                Animation.AnimationState.AddAnimation(0, IdleAnimationName, true, 0f);
-            }
+            Bow.StartedAiming -= StartAiming;
+            Bow.EndedAiming -= EndAiming;
         }
 
         private void OnAnimationEvent(TrackEntry trackentry, Event e)
@@ -59,5 +84,6 @@ namespace BowSystem.Scripts.Service
             if (e.Data.Name == ShootEventName)
                 Bow.Shoot();
         }
+
     }
 }

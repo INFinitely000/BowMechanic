@@ -51,7 +51,7 @@ namespace BowSystem.Scripts
             Services.Register<IInput>(new StandaloneInput());
             Services.Register<IFactory>(new Factory(
                 assets: Services.Single<IAssets>(), 
-                input: Services.Single<IInput>()));
+                input: Services.Single<IInput>(), GameData));
         }
     }
 }

@@ -1,11 +1,11 @@
-using System;
+using BowSystem.Scripts.Service;
 using Spine;
 using Spine.Unity;
 using UnityEngine;
 
-namespace BowSystem.Scripts.Service
+namespace BowSystem.Scripts.Gameplay.Player
 {
-    public class MouseIKTarget : MonoBehaviour
+    public class MouseIKTarget : MouseTargetable
     {
         [field: SerializeField] public SkeletonAnimation Animation { get; private set; }
         
@@ -16,23 +16,17 @@ namespace BowSystem.Scripts.Service
         
         public IInput Input { get; private set; }
         
-        public void Construct(IInput input)
+        private void Awake()
         {
-            Input = input;
-
             Bone = Animation.Skeleton.FindBone(BoneName);
         }
 
-
-        private void Update()
+        public override void TargetTo(Vector2 position)
         {
-            var mousePosition = Input.AimPosition;
-            var worldMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            var skeletonSpacePoint = Animation.transform.InverseTransformPoint(worldMousePosition);
-            skeletonSpacePoint.x *= Animation.Skeleton.ScaleX;
-            skeletonSpacePoint.y *= Animation.Skeleton.ScaleY;
+            position.x *= Animation.Skeleton.ScaleX;
+            position.y *= Animation.Skeleton.ScaleY;
             
-            Bone.SetLocalPosition(skeletonSpacePoint);
+            Bone.SetLocalPosition(position);
         }
     }
 }

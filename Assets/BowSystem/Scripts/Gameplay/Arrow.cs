@@ -11,11 +11,33 @@ namespace BowSystem.Scripts.Gameplay
         [field: SerializeField] public Rigidbody2D Rigidbody { get; private set; }
 
         private bool _isDestroyed;
+
+        public float Radius { get; private set; }
+        public float Power { get; private set; }
+        
+        public void Construct(float radius, float power)
+        {
+            Radius = radius;
+            Power = power;
+        }
         
 
         private void OnCollisionEnter2D(Collision2D other)
         {
             if (_isDestroyed) return;
+
+            var hits = Physics2D.CircleCastAll(transform.position, Radius, transform.forward, Radius);
+
+            foreach (var hit in hits)
+            {
+                if (hit.rigidbody != null)
+                {
+                    var difference = (Vector2)transform.position - hit.point;
+                    var velocity = difference.normalized * Mathf.Max(0, Radius - difference.magnitude) * difference.normalized;
+                    
+                    hit.rigidbody.AddForceAtPosition(velocity, transform.position, ForceMode2D.Impulse);
+                }
+            }
             
             StartCoroutine(Destroy());
         }

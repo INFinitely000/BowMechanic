@@ -1,3 +1,4 @@
+using BowSystem.Scripts.Gameplay.Player;
 using BowSystem.Scripts.Service;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -31,8 +32,9 @@ namespace BowSystem.Scripts.States
             var levelData = Object.FindObjectOfType<LevelData>();
             
             var mainPlayer = factory.CreateMainPlayer(levelData.PlayerSpawnpoint.position);
-                mainPlayer.GetComponentInChildren<MouseIKTarget>().Construct(input);
                 mainPlayer.GetComponentInChildren<PlayerBow>().Construct(factory, input);
+
+            stateMachine.Entry<GameplayState>();
         }
 
         public void Exit()

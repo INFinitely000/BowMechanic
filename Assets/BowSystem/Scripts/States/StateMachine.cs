@@ -19,7 +19,8 @@ namespace BowSystem.Scripts.States
             {
                 [typeof(BootstrapState)] = new BootstrapState(this, 
                     Services.Single<IFactory>(), 
-                    Services.Single<IInput>())
+                    Services.Single<IInput>()),
+                [typeof(GameplayState)] = new GameplayState()
             };
         }
 
